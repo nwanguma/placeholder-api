@@ -1,4 +1,4 @@
-const Bounty = require("../models/Bounty.js");
+const Bounty = require("../models/bounty.js");
 const _ = require("lodash");
 
 const createBounty = async (req, res) => {

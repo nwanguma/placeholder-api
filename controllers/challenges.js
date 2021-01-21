@@ -1,4 +1,4 @@
-const Challenge = require("../models/Challenge.js");
+const Challenge = require("../models/challenge.js");
 const _ = require("lodash");
 
 const createChallenge = async (req, res) => {

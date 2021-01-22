@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
+const _ = require("lodash");
 const bcrypt = require("bcryptjs");
 const { ObjectID } = require("mongodb");
 const Profile = require("./profile");
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -19,6 +20,53 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+UserSchema.statics.findByCredentials = async function (
+  username,
+  email,
+  password
+) {
+  const User = this;
+
+  const user = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (!user) throw new Error({ code: 401, message: "user not found" });
+
+  bcrypt.compare(password, user.password, (err, res) => {
+    if (!res) {
+    }
+  });
+};
+
+UserSchema.methods.generateAuthToken = async function () {
+  const user = this;
+  const access = "auth";
+
+  const token = jwt
+    .sign({ _id: user._id.toHexString(), access }, process.env.SECRET)
+    .toString();
+
+  user.tokens.push({ token, access });
+
+  try {
+    await user.save();
+
+    return token;
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+UserSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = user.toObject();
+
+  const body = _.pick(userObject, ["username", "email"]);
+
+  return body;
+};
 
 UserSchema.methods.generateProfile = async function () {
   const user = this;

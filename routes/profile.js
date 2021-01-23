@@ -1,8 +1,17 @@
 const express = require("express");
-const { createProfile } = require("../controllers/profile.js");
+const {
+  getProfile,
+  createProfile,
+  editProfile,
+} = require("../controllers/profile.js");
+const authenticate = require("../middlewares/auth.js");
 
 const router = express.Router();
 
-router.route("/").post(createProfile);
+router
+  .route("/")
+  .get(authenticate, getProfile)
+  .post(authenticate, createProfile)
+  .patch(authenticate, editProfile);
 
 module.exports = router;

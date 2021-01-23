@@ -21,6 +21,23 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+UserSchema.statics.findByToken = function (token) {
+  let decoded;
+  const User = this;
+
+  try {
+    decoded = jwt.verify(token, process.env.SECRET);
+  } catch (e) {
+    return Promise.reject({ code: 401, message: "user not authorized" });
+  }
+
+  return User.findOne({
+    _id: decoded._id,
+    "tokens.access": "auth",
+    "tokens.token": token,
+  });
+};
+
 UserSchema.statics.findByCredentials = async function (
   username,
   email,
@@ -34,9 +51,14 @@ UserSchema.statics.findByCredentials = async function (
 
   if (!user) throw new Error({ code: 401, message: "user not found" });
 
-  bcrypt.compare(password, user.password, (err, res) => {
-    if (!res) {
-    }
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, user.password, (err, res) => {
+      if (!res) {
+        return new Error({ code: 401, message: "invalid credentials" });
+      }
+
+      resolve(user);
+    });
   });
 };
 
@@ -63,7 +85,7 @@ UserSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
 
-  const body = _.pick(userObject, ["username", "email"]);
+  const body = _.pick(userObject, ["username", "email", "profile"]);
 
   return body;
 };

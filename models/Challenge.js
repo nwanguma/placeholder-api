@@ -12,6 +12,10 @@ const ChallengeSchema = new mongoose.Schema(
     company: String,
     companyUrl: String,
     user: { ref: "user", type: mongoose.Schema.Types.ObjectId },
+    completedChallenge: {
+      ref: "completedChallenge",
+      type: mongoose.Schema.Types.ObjectId,
+    },
   },
   { timestamps: true }
 );

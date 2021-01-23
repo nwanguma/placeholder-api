@@ -39,9 +39,37 @@ const getChallenges = async (req, res) => {
 
     if (!challenges.length === 0) throw new Error();
 
+    const challengesWithCompleted = challenges
+      .populate("completedChallenges")
+      .execPopulate();
+
     res.json({
       success: true,
-      data: challenges,
+      data: challengesWithCompleted,
+    });
+  } catch (e) {
+    res.status(400).send({
+      success: false,
+    });
+  }
+};
+
+const getChallenge = async (req, res) => {
+  const user = req.user;
+  const id = req.params.id;
+
+  try {
+    const challenge = await Challenge.findOne({ user: user._id, _id: id });
+
+    if (!challenge) throw new Error();
+
+    const challengeWithCompleted = challenge
+      .populate("completedChallenges")
+      .execPopulate();
+
+    res.json({
+      success: true,
+      data: challengeWithCompleted,
     });
   } catch (e) {
     res.status(400).send({

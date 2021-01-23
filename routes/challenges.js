@@ -6,6 +6,10 @@ const {
   deleteChallenge,
   getAllChallenges,
 } = require("../controllers/challenges.js");
+const {
+  getUserCompletedChallenges,
+  getUserCompletedChallenge,
+} = require("../controllers/completedChallenges.js");
 const authenticate = require("../middlewares/auth.js");
 
 const router = express.Router();
@@ -21,5 +25,12 @@ router
   .delete(authenticate, deleteChallenge);
 
 router.get("/all", authenticate, getAllChallenges);
+
+router
+  .route("/complete")
+  .get(authenticate, getUserCompletedChallenges)
+  .post(authenticate, createChallenge);
+
+router.get("/:id", authenticate, getUserCompletedChallenge);
 
 module.exports = router;

@@ -1,15 +1,34 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
+const _ = require("lodash");
 
 const BountySchema = new mongoose.Schema(
   {
     title: String,
-    company: String,
-    companyUrl: String,
-    repoUrl: String,
+    description: String,
+    instructions: [String],
+    product: String,
+    productUrl: String,
+    expiry: Date,
+    user: { ref: "user", type: mongoose.Schema.Types.ObjectId },
   },
   { timestamps: true }
 );
+
+BountySchema.methods.toJSON = function () {
+  const bounty = this;
+  const bountyObject = bounty.toObject();
+
+  const body = _.pick(bountyObject, [
+    "title",
+    "description",
+    "instructions",
+    "product",
+    "productUrl",
+    "expiry",
+  ]);
+
+  return body;
+};
 
 const Bounty = mongoose.model("Bounty", BountySchema);
 

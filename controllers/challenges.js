@@ -24,7 +24,6 @@ const createChallenge = async (req, res) => {
       data: challenge,
     });
   } catch (e) {
-    console.log(e);
     res.status(400).send({
       success: false,
       code: 400,
@@ -45,7 +44,6 @@ const getChallenges = async (req, res) => {
       data: challenges,
     });
   } catch (e) {
-    console.log(e);
     res.status(400).send({
       success: false,
     });

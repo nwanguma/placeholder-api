@@ -93,8 +93,26 @@ const changeUserPassword = async (req, res) => {
   });
 };
 
+const getUser = async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    res.status(400).json({
+      success: false,
+    });
+  } else {
+    const userWithProfile = await user.populate("profile").execPopulate();
+
+    res.send({
+      success: true,
+      data: userWithProfile,
+    });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
   changeUserPassword,
+  getUser,
 };

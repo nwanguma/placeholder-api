@@ -1,5 +1,5 @@
-const Challenge = require("../models/challenge.js");
 const _ = require("lodash");
+const Challenge = require("../models/challenge.js");
 
 const createChallenge = async (req, res) => {
   const user = req.user;
@@ -35,19 +35,16 @@ const getChallenges = async (req, res) => {
   const user = req.user;
 
   try {
-    const challenges = await Challenge.find({ user: user._id });
-
-    if (!challenges.length === 0) throw new Error();
-
-    const challengesWithCompleted = challenges
+    const challenges = await Challenge.find({ user: user._id })
       .populate("completedChallenges")
-      .execPopulate();
+      .exec();
 
     res.json({
       success: true,
-      data: challengesWithCompleted,
+      data: challenges,
     });
   } catch (e) {
+    console.log(e);
     res.status(400).send({
       success: false,
     });
@@ -59,19 +56,19 @@ const getChallenge = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const challenge = await Challenge.findOne({ user: user._id, _id: id });
+    const challenge = await Challenge.findOne({
+      user: user._id,
+      _id: id,
+    }).populate("completedChallenges");
 
     if (!challenge) throw new Error();
 
-    const challengeWithCompleted = challenge
-      .populate("completedChallenges")
-      .execPopulate();
-
     res.json({
       success: true,
-      data: challengeWithCompleted,
+      data: challenge,
     });
   } catch (e) {
+    console.log(e);
     res.status(400).send({
       success: false,
     });
@@ -161,6 +158,7 @@ const getAllChallenges = async (req, res) => {
       data: challenges,
     });
   } catch (e) {
+    console.log(e);
     res.status(400).send({
       success: false,
     });
@@ -173,4 +171,5 @@ module.exports = {
   editChallenge,
   deleteChallenge,
   getAllChallenges,
+  getChallenge,
 };

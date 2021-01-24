@@ -1,9 +1,11 @@
 const CompletedChallenge = require("../models/completedChallenge.js");
 const _ = require("lodash");
+const mongodb = require("mongodb");
 
 const createCompletedChallenge = async (req, res) => {
   const user = req.user;
   const challengeId = req.params.id;
+  const completedChallengeId = new mongodb.ObjectID();
   const body = _.pick(req.body, [
     "comments",
     "challengeRepo",
@@ -12,10 +14,17 @@ const createCompletedChallenge = async (req, res) => {
     "employmentStatus",
   ]);
 
+  if (!challengeId)
+    res.status(400).json({
+      success: false,
+      message: "missing parameter",
+    });
+
   const newCompletedChallenge = new CompletedChallenge({
     ...body,
     user: user._id,
     challenge: challengeId,
+    _id: completedChallengeId,
   });
 
   try {
@@ -36,6 +45,8 @@ const createCompletedChallenge = async (req, res) => {
 
 const getUserCompletedChallenges = async (req, res) => {
   const user = req.user;
+
+  console.log(user);
 
   try {
     const completedChallenges = CompletedChallenge.find({ user: user._id });

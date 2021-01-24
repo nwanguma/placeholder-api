@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const _ = require("lodash");
+const Challenge = require("./challenge.js");
 
 const CompletedChallengeSchema = new mongoose.Schema(
   {
@@ -9,10 +10,31 @@ const CompletedChallengeSchema = new mongoose.Schema(
     githubUrl: String,
     employmentStatus: Boolean,
     user: { ref: "user", type: mongoose.Schema.Types.ObjectId },
-    challenge: { ref: "challenge", type: mongoose.Schema.Types.ObjectId },
+    challenge: {
+      ref: "Challenge",
+      type: mongoose.Schema.Types.ObjectId,
+    },
   },
   { timestamps: true }
 );
+
+CompletedChallengeSchema.pre("save", async function (next) {
+  const completedChallenge = this;
+
+  const challenge = await Challenge.findOne({
+    _id: completedChallenge.challenge,
+  });
+
+  if (challenge) {
+    challenge.completedChallenges.push(completedChallenge._id);
+
+    await challenge.save();
+
+    next();
+  } else {
+    next();
+  }
+});
 
 CompletedChallengeSchema.methods.toJSON = function () {
   const completedChallenge = this;
@@ -30,6 +52,8 @@ CompletedChallengeSchema.methods.toJSON = function () {
 };
 
 const CompletedChallenge = mongoose.model(
-  "completedChallenge",
+  "CompletedChallenge",
   CompletedChallengeSchema
 );
+
+module.exports = CompletedChallenge;

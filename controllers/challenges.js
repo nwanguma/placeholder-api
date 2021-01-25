@@ -44,7 +44,6 @@ const getChallenges = async (req, res) => {
       data: challenges,
     });
   } catch (e) {
-    console.log(e);
     res.status(400).send({
       success: false,
     });
@@ -68,7 +67,6 @@ const getChallenge = async (req, res) => {
       data: challenge,
     });
   } catch (e) {
-    console.log(e);
     res.status(400).send({
       success: false,
     });
@@ -149,7 +147,9 @@ const deleteChallenge = async (req, res) => {
 
 const getAllChallenges = async (req, res) => {
   try {
-    const challenges = await Challenge.find();
+    const challenges = await Challenge.find()
+      .populate("completedChallenges")
+      .exec();
 
     if (challenges.length === 0) throw new Error();
 
@@ -158,7 +158,6 @@ const getAllChallenges = async (req, res) => {
       data: challenges,
     });
   } catch (e) {
-    console.log(e);
     res.status(400).send({
       success: false,
     });

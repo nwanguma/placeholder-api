@@ -47,9 +47,10 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (e) {
-    res.status(400).json({
+    res.status(e.code || 400).json({
       success: false,
-      code: 400,
+      message: e.message || "Bad request",
+      code: e.code || 400,
     });
   }
 };

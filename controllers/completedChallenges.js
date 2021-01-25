@@ -46,8 +46,6 @@ const createCompletedChallenge = async (req, res) => {
 const getUserCompletedChallenges = async (req, res) => {
   const user = req.user;
 
-  console.log(user);
-
   try {
     const completedChallenges = CompletedChallenge.find({ user: user._id });
 

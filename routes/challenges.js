@@ -22,15 +22,14 @@ router
   .post(authenticate, createChallenge)
   .get(authenticate, getChallenges);
 
+router.route("/all").get(authenticate, getAllChallenges);
+
 //edit specific challenge, delete specific challenge, list specific challenge
 router
   .route("/:id")
   .patch(authenticate, editChallenge)
   .delete(authenticate, deleteChallenge)
   .get(authenticate, getChallenge);
-
-// get all challenges not just the user's
-router.get("/all", authenticate, getAllChallenges);
 
 //Get a user's completed challenges
 router.route("/complete").get(authenticate, getUserCompletedChallenges);

@@ -49,15 +49,15 @@ UserSchema.statics.findByCredentials = async function (
     $or: [{ username }, { email }],
   });
 
-  if (!user) throw new Error({ code: 401, message: "user not found" });
+  if (!user) return Promise.reject({ code: 400, message: "user not found" });
 
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, user.password, (err, res) => {
       if (!res) {
-        return new Error({ code: 401, message: "invalid credentials" });
+        reject({ code: 401, message: "invalid credentials" });
+      } else {
+        resolve(user);
       }
-
-      resolve(user);
     });
   });
 };

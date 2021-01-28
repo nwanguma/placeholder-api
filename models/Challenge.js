@@ -38,6 +38,7 @@ ChallengeSchema.methods.toJSON = function () {
     "companyUrl",
     "createdAt",
     "updatedAt",
+    "_id",
   ]);
 
   return body;

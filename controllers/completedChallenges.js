@@ -47,7 +47,9 @@ const getUserCompletedChallenges = async (req, res) => {
   const user = req.user;
 
   try {
-    const completedChallenges = CompletedChallenge.find({ user: user._id });
+    const completedChallenges = await CompletedChallenge.find({
+      user: user._id,
+    });
 
     if (completedChallenges.length === 0) throw new Error();
 
@@ -66,11 +68,16 @@ const getUserCompletedChallenge = async (req, res) => {
   const user = req.user;
   const id = req.params.id;
 
+  console.log(user.email);
+  console.log(id);
+
   try {
-    const completedChallenge = CompletedChallenge.findOne({
+    const completedChallenge = await CompletedChallenge.findOne({
       user: user._id,
       _id: id,
     });
+
+    console.log(completedChallenge);
 
     if (!completedChallenge) throw new Error();
 

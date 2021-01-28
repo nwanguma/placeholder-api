@@ -34,23 +34,27 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findByCredentials(username, email, password);
     const token = await user.generateAuthToken();
+    const userWithValues = await user
+      .populate("challenges")
+      .populate("completedChallenges")
+      .execPopulate();
 
     if (!token) {
-      throw new Error({ status: 400, message: "bad request" });
+      throw { status: 400, message: "bad request" };
     }
 
     res.json({
       success: true,
       data: {
         token,
-        user,
+        user: userWithValues,
       },
     });
   } catch (e) {
-    res.status(e.code || 400).json({
+    res.status(e.status || 400).json({
       success: false,
       message: e.message || "Bad request",
-      code: e.code || 400,
+      status: e.status || 400,
     });
   }
 };

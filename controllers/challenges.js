@@ -31,7 +31,7 @@ const createChallenge = async (req, res) => {
   }
 };
 
-const getChallenges = async (req, res) => {
+const getUserChallenges = async (req, res) => {
   const user = req.user;
 
   try {
@@ -50,7 +50,7 @@ const getChallenges = async (req, res) => {
   }
 };
 
-const getChallenge = async (req, res) => {
+const getUserChallenge = async (req, res) => {
   const user = req.user;
   const id = req.params.id;
 
@@ -60,15 +60,48 @@ const getChallenge = async (req, res) => {
       _id: id,
     }).populate("completedChallenges");
 
-    if (!challenge) throw new Error();
+    if (!challenge)
+      throw {
+        status: 400,
+        message: "challenge not found",
+      };
 
     res.json({
       success: true,
       data: challenge,
     });
   } catch (e) {
-    res.status(400).send({
+    res.status(e.status || 400).send({
       success: false,
+      message: e.message || "An error occurred",
+      status: e.status || 400,
+    });
+  }
+};
+
+const getChallenge = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const challenge = await Challenge.findOne({
+      _id: id,
+    }).populate("completedChallenges");
+
+    if (!challenge)
+      throw {
+        status: 400,
+        message: "challenge not found",
+      };
+
+    res.json({
+      success: true,
+      data: challenge,
+    });
+  } catch (e) {
+    res.status(e.status || 400).send({
+      success: false,
+      message: e.message || "An error occurred",
+      status: e.status || 400,
     });
   }
 };
@@ -166,9 +199,10 @@ const getAllChallenges = async (req, res) => {
 
 module.exports = {
   createChallenge,
-  getChallenges,
+  getUserChallenges,
   editChallenge,
   deleteChallenge,
   getAllChallenges,
+  getUserChallenge,
   getChallenge,
 };

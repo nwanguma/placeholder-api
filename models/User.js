@@ -11,6 +11,10 @@ const UserSchema = new mongoose.Schema(
     email: String,
     password: String,
     profile: { type: mongoose.Schema.Types.ObjectId, ref: "Profile" },
+    completedChallenges: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "CompletedChallenge" },
+    ],
+    challenges: [{ type: mongoose.Schema.Types.ObjectId, ref: "Challenge" }],
     tokens: [
       {
         token: String,
@@ -49,12 +53,12 @@ UserSchema.statics.findByCredentials = async function (
     $or: [{ username }, { email }],
   });
 
-  if (!user) return Promise.reject({ code: 400, message: "user not found" });
+  if (!user) return Promise.reject({ status: 400, message: "user not found" });
 
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, user.password, (err, res) => {
       if (!res) {
-        reject({ code: 401, message: "invalid credentials" });
+        reject({ status: 401, message: "invalid credentials" });
       } else {
         resolve(user);
       }
@@ -77,7 +81,7 @@ UserSchema.methods.generateAuthToken = async function () {
 
     return token;
   } catch (e) {
-    throw new Error(e);
+    throw e;
   }
 };
 
@@ -85,7 +89,13 @@ UserSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
 
-  const body = _.pick(userObject, ["username", "email", "profile"]);
+  const body = _.pick(userObject, [
+    "username",
+    "email",
+    "profile",
+    "completedChallenges",
+    "challenges",
+  ]);
 
   return body;
 };

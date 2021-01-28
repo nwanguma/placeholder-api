@@ -1,7 +1,8 @@
 const express = require("express");
 const {
   createChallenge,
-  getChallenges,
+  getUserChallenges,
+  getUserChallenge,
   editChallenge,
   deleteChallenge,
   getAllChallenges,
@@ -20,19 +21,20 @@ const router = express.Router();
 router
   .route("/")
   .post(authenticate, createChallenge)
-  .get(authenticate, getChallenges);
+  .get(authenticate, getUserChallenges);
+
+//Get a user's completed challenges
+router.route("/complete").get(authenticate, getUserCompletedChallenges);
 
 router.route("/all").get(authenticate, getAllChallenges);
+router.route("/all/:id").get(authenticate, getChallenge);
 
 //edit specific challenge, delete specific challenge, list specific challenge
 router
   .route("/:id")
   .patch(authenticate, editChallenge)
   .delete(authenticate, deleteChallenge)
-  .get(authenticate, getChallenge);
-
-//Get a user's completed challenges
-router.route("/complete").get(authenticate, getUserCompletedChallenges);
+  .get(authenticate, getUserChallenge);
 
 //get single completed challenge
 router

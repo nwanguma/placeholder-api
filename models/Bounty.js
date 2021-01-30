@@ -9,6 +9,12 @@ const BountySchema = new mongoose.Schema(
     product: String,
     productUrl: String,
     expiry: Date,
+    completedBounties: [
+      {
+        ref: "CompletedBounty",
+        type: mongoose.Schema.Types.ObjectId,
+      },
+    ],
     user: { ref: "user", type: mongoose.Schema.Types.ObjectId },
   },
   { timestamps: true }
@@ -24,6 +30,7 @@ BountySchema.methods.toJSON = function () {
     "instructions",
     "product",
     "productUrl",
+    "completedBounties",
     "expiry",
   ]);
 

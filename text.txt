@@ -1,0 +1,70 @@
+Login - /login 
+
+30-01-2021 --- works
+
+**
+
+Register - /register 
+
+30-01-2021 --- works
+
+**
+
+Change password - /password
+
+30-01-2021 --- failed, called user.save(), works
+
+**
+
+Get authenticated user - /user/me
+
+30-01-2021 --- works
+
+**
+
+Edit user profile - /profile
+
+30-01-2021 --- works
+
+**
+
+Create challenge - /challenges 
+
+30-01-2021 --- works
+
+**
+
+List all challenges - /challenges/all
+
+30-01-2021 --- works
+
+**
+
+List user challenges - /challenges
+
+30-01-2021 --- works
+
+**
+
+List challenge - /challenges/all/:id
+
+30-01-2021 --- works
+
+**
+
+List user challenge - /challenges/:id
+
+30-01-2021 --- works
+
+**
+
+
+
+
+
+
+
+
+
+
+

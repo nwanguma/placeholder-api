@@ -97,7 +97,18 @@ UserSchema.methods.toJSON = function () {
     "challenges",
   ]);
 
-  return body;
+  const profileObject = body.profile;
+
+  const profileBody = _.pick(profileObject, [
+    "firstname",
+    "lastname",
+    "bio",
+    "company",
+    "githubUrl",
+    "website",
+  ]);
+
+  return { ...body, profile: profileBody };
 };
 
 UserSchema.methods.generateProfile = async function () {

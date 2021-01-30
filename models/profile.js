@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const _ = require("lodash");
 
 const ProfileSchema = new mongoose.Schema(
   {
@@ -33,6 +34,22 @@ const ProfileSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+ProfileSchema.methods.toJSON = function () {
+  const profile = this;
+  const profileObject = profile.toObject();
+
+  const body = _.pick(profileObject, [
+    "firstname",
+    "lastname",
+    "bio",
+    "company",
+    "githubUrl",
+    "website",
+  ]);
+
+  return body;
+};
 
 const Profile = mongoose.model("Profile", ProfileSchema);
 

@@ -39,8 +39,13 @@ const getUserChallenges = async (req, res) => {
       .populate("completedChallenges")
       .exec();
 
+    const count = await Challenge.find({
+      user: user._id,
+    }).count();
+
     res.json({
       success: true,
+      count,
       data: challenges,
     });
   } catch (e) {
@@ -108,6 +113,7 @@ const getChallenge = async (req, res) => {
 
 const editChallenge = async (req, res) => {
   const updates = {};
+  const user = req.user;
   const id = req.params.id;
   const body = _.pick(req.body, [
     "title",
@@ -140,12 +146,15 @@ const editChallenge = async (req, res) => {
   if (companyUrl) updates.companyUrl = companyUrl;
 
   try {
-    const challenge = await Challenge.updateOne(
+    const challenge = await Challenge.findOneAndUpdate(
       {
         _id: id,
+        user: user._id,
       },
       { $set: updates }
     );
+
+    if (!challenge) throw new Error();
 
     res.send({
       success: true,
@@ -184,10 +193,13 @@ const getAllChallenges = async (req, res) => {
       .populate("completedChallenges")
       .exec();
 
+    const count = await Challenge.find().count();
+
     if (challenges.length === 0) throw new Error();
 
     res.json({
       success: true,
+      count,
       data: challenges,
     });
   } catch (e) {

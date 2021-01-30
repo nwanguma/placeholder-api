@@ -46,6 +46,7 @@ CompletedChallengeSchema.methods.toJSON = function () {
     "website",
     "githubUrl",
     "employmentStatus",
+    "_id",
   ]);
 
   return body;

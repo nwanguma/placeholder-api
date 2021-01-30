@@ -60,7 +60,7 @@ const editProfile = async (req, res) => {
   if (githubUrl) updates.githubUrl = githubUrl;
 
   try {
-    const profile = await Profile.updateOne(
+    const profile = await Profile.findOneAndUpdate(
       { user: user._id },
       {
         $set: updates,

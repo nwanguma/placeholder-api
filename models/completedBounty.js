@@ -7,7 +7,7 @@ const CompletedBountySchema = new mongoose.Schema(
     challengeRepo: String,
     website: String,
     githubUrl: String,
-    employmentStatus: Boolean,
+    // employmentStatus: Boolean,
     user: { ref: "user", type: mongoose.Schema.Types.ObjectId },
     challenge: {
       ref: "Bounty",

@@ -1,8 +1,10 @@
 const _ = require("lodash");
+const { ObjectID } = require("mongodb");
 const Challenge = require("../models/challenge.js");
 
 const createChallenge = async (req, res) => {
   const user = req.user;
+  const challengeId = new ObjectID();
   const body = _.pick(req.body, [
     "title",
     "description",
@@ -14,10 +16,17 @@ const createChallenge = async (req, res) => {
     "companyUrl",
   ]);
 
-  const newChallenge = new Challenge({ ...body, user: user._id });
+  const newChallenge = new Challenge({
+    ...body,
+    _id: challengeId,
+    user: user._id,
+  });
 
   try {
     const challenge = await newChallenge.save();
+    user.challenges.push(challengeId);
+
+    user.save();
 
     res.json({
       success: true,
@@ -33,20 +42,15 @@ const createChallenge = async (req, res) => {
 
 const getUserChallenges = async (req, res) => {
   const user = req.user;
+  const queries = req.query;
 
   try {
-    const challenges = await Challenge.find({ user: user._id })
-      .populate("completedChallenges")
-      .exec();
-
-    const count = await Challenge.find({
-      user: user._id,
-    }).count();
+    await req.user.populate("challenges").execPopulate();
 
     res.json({
       success: true,
-      count,
-      data: challenges,
+      // count,
+      data: req.user.challenges,
     });
   } catch (e) {
     res.status(400).send({

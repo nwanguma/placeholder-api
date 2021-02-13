@@ -2,63 +2,44 @@ const User = require("../models/user.js");
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const AppError = require("../util/AppError.js");
 
 const createUser = async (req, res) => {
   const body = _.pick(req.body, ["username", "email", "password"]);
+
   const newUser = new User(body);
 
-  try {
-    const user = await newUser.save();
-    const userWithProfile = await user.generateProfile();
-    const token = await userWithProfile.generateAuthToken();
+  const user = await newUser.save();
+  const userWithProfile = await user.generateProfile();
+  const token = await userWithProfile.generateAuthToken();
 
-    res.json({
-      success: true,
-      data: {
-        user: userWithProfile,
-        token,
-      },
-    });
-  } catch (e) {
-    console.log(e);
-
-    res.status(400).send({
-      success: false,
-      code: 400,
-    });
-  }
+  res.json({
+    success: true,
+    data: {
+      user: userWithProfile,
+      token,
+    },
+  });
 };
 
 const loginUser = async (req, res) => {
   const body = _.pick(req.body, ["username", "email", "password"]);
   const { username, email, password } = body;
 
-  try {
-    const user = await User.findByCredentials(username, email, password);
-    const token = await user.generateAuthToken();
-    const userWithValues = await user
-      .populate("challenges")
-      .populate("completedChallenges")
-      .execPopulate();
+  const user = await User.findByCredentials(username, email, password);
+  const token = await user.generateAuthToken();
+  const userWithValues = await user
+    .populate("challenges")
+    .populate("completedChallenges")
+    .execPopulate();
 
-    if (!token) {
-      throw { status: 400, message: "bad request" };
-    }
-
-    res.json({
-      success: true,
-      data: {
-        token,
-        user: userWithValues,
-      },
-    });
-  } catch (e) {
-    res.status(e.status || 400).json({
-      success: false,
-      message: e.message || "Bad request",
-      status: e.status || 400,
-    });
-  }
+  res.json({
+    success: true,
+    data: {
+      token,
+      user: userWithValues,
+    },
+  });
 };
 
 const changeUserPassword = async (req, res) => {
@@ -106,9 +87,7 @@ const getUser = async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    res.status(400).json({
-      success: false,
-    });
+    throw new AppError("User not found", 404);
   } else {
     const userWithProfile = await user.populate("profile").execPopulate();
 

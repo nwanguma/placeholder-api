@@ -6,14 +6,16 @@ const {
   getUser,
 } = require("../controllers/users.js");
 const authenticate = require("../middlewares/auth");
+const catchAsync = require("../util/catchAsync.js");
+const userValidation = require("../middlewares/userInputValidation.js");
 
 const router = express.Router();
 
 router.route("/").post(createUser);
 
-router.post("/register", createUser);
-router.post("/login", loginUser);
+router.post("/register", userValidation, catchAsync(createUser));
+router.post("/login", catchAsync(loginUser));
 router.patch("/password", authenticate, changeUserPassword);
-router.get("/me", authenticate, getUser);
+router.get("/me", authenticate, catchAsync(getUser));
 
 module.exports = router;

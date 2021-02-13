@@ -1,6 +1,7 @@
 const CompletedBounty = require("../models/completedBounty.js");
 const _ = require("lodash");
 const mongodb = require("mongodb");
+const AppError = require("../util/AppError.js");
 
 const createdCompletedBounty = async (req, res) => {
   const user = req.user;
@@ -14,11 +15,7 @@ const createdCompletedBounty = async (req, res) => {
     "employmentStatus",
   ]);
 
-  if (!bountyId)
-    res.status(400).json({
-      success: false,
-      message: "missing parameter",
-    });
+  if (!bountyId) throw new AppError("Missing parameters", 400);
 
   const newCompletedBounty = new CompletedBounty({
     ...body,
@@ -27,64 +24,46 @@ const createdCompletedBounty = async (req, res) => {
     _id: completedBountyId,
   });
 
-  try {
-    const completedBounty = await newCompletedBounty.save();
+  const completedBounty = await newCompletedBounty.save();
 
-    if (!completedBounty) throw new Error();
+  if (!completedBounty)
+    throw new AppError("Completed bounty does not exist", 404);
 
-    res.status(201).json({
-      success: true,
-      data: completedBounty,
-    });
-  } catch (e) {
-    res.status(400).json({
-      success: false,
-    });
-  }
+  res.status(201).json({
+    success: true,
+    data: completedBounty,
+  });
 };
 
 const getUserCompletedBounties = async (req, res) => {
   const user = req.user;
 
-  try {
-    const completedBounties = await CompletedBounty.find({
-      user: user._id,
-    });
+  const completedBounties = await CompletedBounty.find({
+    user: user._id,
+  });
 
-    if (completedBounties.length === 0) throw new Error();
-
-    res.json({
-      success: true,
-      data: completedBounties,
-    });
-  } catch (e) {
-    res.json({
-      success: false,
-    });
-  }
+  res.json({
+    success: true,
+    data: completedBounties,
+  });
 };
 
 const getUserCompletedBounty = async (req, res) => {
   const user = req.user;
   const id = req.params.id;
 
-  try {
-    const completedBounty = await CompletedBounty.findOne({
-      user: user._id,
-      _id: id,
-    });
+  const completedBounty = await CompletedBounty.findOne({
+    user: user._id,
+    _id: id,
+  });
 
-    if (!completedBounty) throw new Error();
+  if (!completedBounty)
+    throw new AppError("Completed bounty does not exist", 404);
 
-    res.json({
-      success: true,
-      data: completedBounty,
-    });
-  } catch (e) {
-    res.status(400).json({
-      success: false,
-    });
-  }
+  res.json({
+    success: true,
+    data: completedBounty,
+  });
 };
 
 module.exports = {

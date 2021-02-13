@@ -1,6 +1,7 @@
 const CompletedChallenge = require("../models/completedChallenge.js");
 const _ = require("lodash");
 const mongodb = require("mongodb");
+const AppError = require("../util/AppError.js");
 
 const createCompletedChallenge = async (req, res) => {
   const user = req.user;
@@ -14,11 +15,7 @@ const createCompletedChallenge = async (req, res) => {
     "employmentStatus",
   ]);
 
-  if (!challengeId)
-    res.status(400).json({
-      success: false,
-      message: "missing parameter",
-    });
+  if (!challengeId) throw new AppError("Missing parameter", 404);
 
   const newCompletedChallenge = new CompletedChallenge({
     ...body,
@@ -27,64 +24,46 @@ const createCompletedChallenge = async (req, res) => {
     _id: completedChallengeId,
   });
 
-  try {
-    const completedChallenge = await newCompletedChallenge.save();
+  const completedChallenge = await newCompletedChallenge.save();
 
-    if (!completedChallenge) throw new Error();
+  if (!completedChallenge)
+    throw new AppError("Completed challenge does not exist", 404);
 
-    res.status(201).json({
-      success: true,
-      data: completedChallenge,
-    });
-  } catch (e) {
-    res.status(400).json({
-      success: false,
-    });
-  }
+  res.status(201).json({
+    success: true,
+    data: completedChallenge,
+  });
 };
 
 const getUserCompletedChallenges = async (req, res) => {
   const user = req.user;
 
-  try {
-    const completedChallenges = await CompletedChallenge.find({
-      user: user._id,
-    });
+  const completedChallenges = await CompletedChallenge.find({
+    user: user._id,
+  });
 
-    if (completedChallenges.length === 0) throw new Error();
-
-    res.json({
-      success: true,
-      data: completedChallenges,
-    });
-  } catch (e) {
-    res.json({
-      success: false,
-    });
-  }
+  res.json({
+    success: true,
+    data: completedChallenges,
+  });
 };
 
 const getUserCompletedChallenge = async (req, res) => {
   const user = req.user;
   const id = req.params.id;
 
-  try {
-    const completedChallenge = await CompletedChallenge.findOne({
-      user: user._id,
-      _id: id,
-    });
+  const completedChallenge = await CompletedChallenge.findOne({
+    user: user._id,
+    _id: id,
+  });
 
-    if (!completedChallenge) throw new Error();
+  if (!completedChallenge)
+    throw new AppError("Completed challenge does not exist", 404);
 
-    res.json({
-      success: true,
-      data: completedChallenge,
-    });
-  } catch (e) {
-    res.json({
-      success: false,
-    });
-  }
+  res.json({
+    success: true,
+    data: completedChallenge,
+  });
 };
 
 module.exports = {

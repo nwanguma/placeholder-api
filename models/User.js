@@ -7,9 +7,12 @@ const jwt = require("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema(
   {
-    username: String,
-    email: String,
-    password: String,
+    username: {
+      type: String,
+      required: true,
+    },
+    email: { type: String, required: true },
+    password: { type: String, required: true },
     profile: { type: mongoose.Schema.Types.ObjectId, ref: "Profile" },
     completedChallenges: [
       { type: mongoose.Schema.Types.ObjectId, ref: "CompletedChallenge" },
@@ -32,7 +35,7 @@ UserSchema.statics.findByToken = function (token) {
   try {
     decoded = jwt.verify(token, process.env.SECRET);
   } catch (e) {
-    return Promise.reject({ code: 401, message: "user not authorized" });
+    return Promise.reject({ status: 401, message: "User not authorized" });
   }
 
   return User.findOne({
@@ -58,7 +61,7 @@ UserSchema.statics.findByCredentials = async function (
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, user.password, (err, res) => {
       if (!res) {
-        reject({ status: 401, message: "invalid credentials" });
+        reject({ status: 401, message: "Invalid credentials" });
       } else {
         resolve(user);
       }

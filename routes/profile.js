@@ -5,13 +5,14 @@ const {
   editProfile,
 } = require("../controllers/profile.js");
 const authenticate = require("../middlewares/auth.js");
+const catchAsync = require("../util/catchAsync.js");
 
 const router = express.Router();
 
 router
   .route("/")
-  .get(authenticate, getProfile)
-  .post(authenticate, createProfile)
-  .patch(authenticate, editProfile);
+  .get(authenticate, catchAsync(getProfile))
+  .post(authenticate, catchAsync(createProfile))
+  .patch(authenticate, catchAsync(editProfile));
 
 module.exports = router;

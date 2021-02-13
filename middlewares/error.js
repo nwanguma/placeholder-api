@@ -1,7 +1,9 @@
 const error = (err, req, res, next) => {
-  console.log("something");
-  res.status(500).send({
+  const { status, message } = err;
+
+  res.status(status).send({
     success: false,
+    message,
   });
 };
 

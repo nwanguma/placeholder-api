@@ -1,42 +1,30 @@
 const Profile = require("../models/profile.js");
 const _ = require("lodash");
+const AppError = require("../util/AppError.js");
 
 const getProfile = async (req, res) => {
   const user = req.user;
 
-  try {
-    const profile = await Profile.findOne({ user: user._id });
+  const profile = await Profile.findOne({ user: user._id });
 
-    if (!profile) throw new Error();
+  if (!profile) throw new AppError("Profile not found", 404);
 
-    res.send({
-      success: true,
-      data: profile,
-    });
-  } catch (e) {
-    res.status(400).send({
-      success: false,
-    });
-  }
+  res.send({
+    success: true,
+    data: profile,
+  });
 };
 
 const createProfile = async (req, res) => {
   const body = _.pick(req.body, ["firstname", "lastname"]);
   const newProfile = new Profile(body);
 
-  try {
-    const profile = await newProfile.save();
+  const profile = await newProfile.save();
 
-    res.status(201).json({
-      success: true,
-      data: profile,
-    });
-  } catch (e) {
-    res.status(400).json({
-      success: false,
-      code: 401,
-    });
-  }
+  res.status(201).json({
+    success: true,
+    data: profile,
+  });
 };
 
 const editProfile = async (req, res) => {
@@ -59,26 +47,19 @@ const editProfile = async (req, res) => {
   if (website) updates.website = website;
   if (githubUrl) updates.githubUrl = githubUrl;
 
-  try {
-    const profile = await Profile.findOneAndUpdate(
-      { user: user._id },
-      {
-        $set: updates,
-      },
-      { returnOriginal: true }
-    );
+  const profile = await Profile.findOneAndUpdate(
+    { user: user._id },
+    {
+      $set: updates,
+    }
+  );
 
-    if (!profile) throw new Error();
+  if (!profile) throw new AppError("Profile does not exist", 404);
 
-    res.status(201).json({
-      success: true,
-      data: profile,
-    });
-  } catch (e) {
-    res.status(400).json({
-      success: false,
-    });
-  }
+  res.status(201).json({
+    success: true,
+    data: profile,
+  });
 };
 
 module.exports = {

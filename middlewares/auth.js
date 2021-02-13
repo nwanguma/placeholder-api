@@ -7,15 +7,11 @@ const authenticate = async (req, res, next) => {
   try {
     const user = await User.findByToken(token);
 
-    if (!user) throw new Error({ code: 401, message: "user not authorized" });
-
     req.user = user;
 
     next();
   } catch (e) {
-    res.status(400).json({
-      success: false,
-    });
+    next(e);
   }
 };
 

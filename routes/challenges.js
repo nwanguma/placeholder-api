@@ -14,32 +14,35 @@ const {
   createCompletedChallenge,
 } = require("../controllers/completedChallenges.js");
 const authenticate = require("../middlewares/auth.js");
+const catchAsync = require("../util/catchAsync.js");
 
 const router = express.Router();
 
 //create challenge, list all created challenges
 router
   .route("/")
-  .post(authenticate, createChallenge)
-  .get(authenticate, getUserChallenges);
+  .post(authenticate, catchAsync(createChallenge))
+  .get(authenticate, catchAsync(getUserChallenges));
 
 //Get a user's completed challenges
-router.route("/complete").get(authenticate, getUserCompletedChallenges);
+router
+  .route("/complete")
+  .get(authenticate, catchAsync(getUserCompletedChallenges));
 
-router.route("/all").get(authenticate, getAllChallenges);
-router.route("/all/:id").get(authenticate, getChallenge);
+router.route("/all").get(authenticate, catchAsync(getAllChallenges));
+router.route("/all/:id").get(authenticate, catchAsync(getChallenge));
 
 //edit specific challenge, delete specific challenge, list specific challenge
 router
   .route("/:id")
-  .patch(authenticate, editChallenge)
-  .delete(authenticate, deleteChallenge)
-  .get(authenticate, getUserChallenge);
+  .patch(authenticate, catchAsync(editChallenge))
+  .delete(authenticate, catchAsync(deleteChallenge))
+  .get(authenticate, catchAsync(getUserChallenge));
 
 //get single completed challenge
 router
   .route("/complete/:id")
-  .get(authenticate, getUserCompletedChallenge)
-  .post(authenticate, createCompletedChallenge);
+  .get(authenticate, catchAsync(getUserCompletedChallenge))
+  .post(authenticate, catchAsync(createCompletedChallenge));
 
 module.exports = router;

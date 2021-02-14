@@ -3,6 +3,7 @@ const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const AppError = require("../utils/AppError.js");
+const sendWelcomeEmail = require("../emails/account.js");
 
 const createUser = async (req, res) => {
   const body = _.pick(req.body, ["username", "email", "password"]);
@@ -11,6 +12,7 @@ const createUser = async (req, res) => {
 
   const user = await newUser.save();
   const userWithProfile = await user.generateProfile();
+  sendWelcomeEmail(user.username, user.email);
   const token = await userWithProfile.generateAuthToken();
 
   res.json({

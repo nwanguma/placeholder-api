@@ -25,6 +25,9 @@ const createdCompletedBounty = async (req, res) => {
   });
 
   const completedBounty = await newCompletedBounty.save();
+  user.completedBounties.push(completedBountyId);
+
+  user.save();
 
   if (!completedBounty)
     throw new AppError("Completed bounty does not exist", 404);

@@ -25,6 +25,9 @@ const createCompletedChallenge = async (req, res) => {
   });
 
   const completedChallenge = await newCompletedChallenge.save();
+  user.completedChallenges.push(completedChallengeId);
+
+  user.save();
 
   if (!completedChallenge)
     throw new AppError("Completed challenge does not exist", 404);
@@ -48,10 +51,12 @@ const getUserCompletedChallenges = async (req, res) => {
   if (sortBy) {
     const parts = sortBy.split(":");
     const key = parts[0];
-    const value = parts[1] === "decsc" ? -1 : 1;
+    const value = parts[1] === "desc" ? -1 : 1;
 
     sort[key] = value;
   }
+
+  console.log("donny van der bench");
 
   await user
     .populate({
@@ -65,9 +70,11 @@ const getUserCompletedChallenges = async (req, res) => {
     })
     .execPopulate();
 
+  console.log(req.user);
+
   res.json({
     success: true,
-    data: completedChallenges,
+    data: req.user.completedChallenges,
   });
 };
 

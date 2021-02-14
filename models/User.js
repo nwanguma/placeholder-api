@@ -17,7 +17,11 @@ const UserSchema = new mongoose.Schema(
     completedChallenges: [
       { type: mongoose.Schema.Types.ObjectId, ref: "CompletedChallenge" },
     ],
+    completedBounties: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "CompletedBounty" },
+    ],
     challenges: [{ type: mongoose.Schema.Types.ObjectId, ref: "Challenge" }],
+    bounties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Bounty" }],
     tokens: [
       {
         token: String,
@@ -56,7 +60,7 @@ UserSchema.statics.findByCredentials = async function (
     $or: [{ username }, { email }],
   });
 
-  if (!user) return Promise.reject({ status: 400, message: "user not found" });
+  if (!user) return Promise.reject({ status: 404, message: "User not found" });
 
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, user.password, (err, res) => {

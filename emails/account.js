@@ -7,7 +7,7 @@ const sendWelcomeEmail = (name, email) => {
     to: email,
     from: "nwangumat@hotmail.com",
     subject: "Welcome to challenge.io",
-    text: `Hello ${name}, welcome to sendGrid`,
+    text: `Hello ${name}, welcome to Challenge.io`,
   });
 };
 

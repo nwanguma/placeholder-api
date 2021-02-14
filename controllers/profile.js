@@ -51,7 +51,8 @@ const editProfile = async (req, res) => {
     { user: user._id },
     {
       $set: updates,
-    }
+    },
+    { returnOriginal: false }
   );
 
   if (!profile) throw new AppError("Profile does not exist", 404);

@@ -4,7 +4,7 @@ const joi = require("joi");
 const userValidationSchema = joi.object({
   username: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
-  password: Joi.string().required().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+  password: Joi.string().required(),
 });
 
 const challengeValidationSchema = joi.object({
@@ -13,7 +13,7 @@ const challengeValidationSchema = joi.object({
   instructions: Joi.string().min(20).required(),
   tags: Joi.array(),
   stack: Joi.string().required(),
-  challengeRepo: Joi.string().uri(),
+  challengeRepo: Joi.string().uri().optional(),
   company: Joi.string(),
   companyUrl: Joi.string(),
 });

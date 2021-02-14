@@ -2,7 +2,7 @@ const User = require("../models/user.js");
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const AppError = require("../util/AppError.js");
+const AppError = require("../utils/AppError.js");
 
 const createUser = async (req, res) => {
   const body = _.pick(req.body, ["username", "email", "password"]);

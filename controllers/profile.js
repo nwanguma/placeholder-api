@@ -1,6 +1,6 @@
 const Profile = require("../models/profile.js");
 const _ = require("lodash");
-const AppError = require("../util/AppError.js");
+const AppError = require("../utils/AppError.js");
 
 const getProfile = async (req, res) => {
   const user = req.user;

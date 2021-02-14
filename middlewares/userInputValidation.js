@@ -1,5 +1,5 @@
-const AppError = require("../util/AppError.js");
-const { userValidationSchema } = require("../util/validationSchemas.js");
+const AppError = require("../utils/AppError.js");
+const { userValidationSchema } = require("../utils/validationSchemas.js");
 
 const userValidation = (req, res, next) => {
   const { error } = userValidationSchema.validate(req.body);

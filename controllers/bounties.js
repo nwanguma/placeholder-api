@@ -1,6 +1,6 @@
 const _ = require("lodash");
 const Bounty = require("../models/bounty.js");
-const AppError = require("../util/AppError.js");
+const AppError = require("../utils/AppError.js");
 
 const createBounty = async (req, res) => {
   const user = req.user;
@@ -23,14 +23,32 @@ const createBounty = async (req, res) => {
 
 const getUserBounties = async (req, res) => {
   const user = req.user;
+  const queries = req.query;
+  const { page, limit, title, product, sortBy } = queries;
+  const match = {};
+  const sort = {};
 
-  const bounties = await Bounty.find({ user: user._id })
-    .populate("completedBounties")
-    .exec();
+  if (title) match.title = title;
+  if (product) match.product = product;
+  if (sortBy) {
+    const parts = sortBy.split(":");
+    const key = parts[0];
+    const value = parts[1] === "decsc" ? -1 : 1;
 
-  const count = await Bounty.find({
-    user: user._id,
-  }).count();
+    sort[key] = value;
+  }
+
+  await user
+    .populate({
+      path: "bounties",
+      match,
+      options: {
+        skip: parseInt(page),
+        limit: parseInt(limit),
+        sort,
+      },
+    })
+    .execPopulate();
 
   res.json({
     success: true,
@@ -136,8 +154,20 @@ const deleteBounty = async (req, res) => {
 };
 
 const getAllBounties = async (req, res) => {
-  const bounties = await Bounty.find().populate("completedBounties").exec();
-  const count = await Bounty.find().count();
+  const queries = req.query;
+  const { page, limit, title, description, product, sort } = queries;
+  const match = {};
+
+  if (title) match.title = title;
+  if (description) match.description = description;
+  if (product) match.product = product;
+
+  const bounties = await Bounty.find(match)
+    .skip(parseInt(page))
+    .limit(parseInt(limit))
+    .sort({ createdAt: sort || -1 })
+    .populate("completedChallenges")
+    .exec();
 
   res.json({
     success: true,

@@ -5,7 +5,7 @@ const {
   editProfile,
 } = require("../controllers/profile.js");
 const authenticate = require("../middlewares/auth.js");
-const catchAsync = require("../util/catchAsync.js");
+const catchAsync = require("../utils/catchAsync.js");
 
 const router = express.Router();
 

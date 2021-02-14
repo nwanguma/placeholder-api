@@ -14,14 +14,15 @@ const {
   createCompletedChallenge,
 } = require("../controllers/completedChallenges.js");
 const authenticate = require("../middlewares/auth.js");
-const catchAsync = require("../util/catchAsync.js");
+const challengeValidation = require("../middlewares/challengeValidation.js");
+const catchAsync = require("../utils/catchAsync.js");
 
 const router = express.Router();
 
 //create challenge, list all created challenges
 router
   .route("/")
-  .post(authenticate, catchAsync(createChallenge))
+  .post(authenticate, challengeValidation, catchAsync(createChallenge))
   .get(authenticate, catchAsync(getUserChallenges));
 
 //Get a user's completed challenges

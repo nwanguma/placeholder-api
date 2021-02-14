@@ -36,6 +36,8 @@ app.use((err, req, res, next) => {
       message: "Id parameter is invalid",
     });
 
+  console.log(err);
+
   next(err);
 });
 

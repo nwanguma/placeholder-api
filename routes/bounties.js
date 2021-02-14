@@ -14,14 +14,15 @@ const {
   createdCompletedBounty,
 } = require("../controllers/completedBounties.js");
 const authenticate = require("../middlewares/auth.js");
-const catchAsync = require("../util/catchAsync.js");
+const bountyValidation = require("../middlewares/bountyValidation.js");
+const catchAsync = require("../utils/catchAsync.js");
 
 const router = express.Router();
 
 //create bounty, list all created bounties
 router
   .route("/")
-  .post(authenticate, catchAsync(createBounty))
+  .post(authenticate, bountyValidation, catchAsync(createBounty))
   .get(authenticate, catchAsync(getUserBounties));
 
 //Get a user's completed challenges

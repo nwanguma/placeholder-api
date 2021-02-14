@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const { ObjectID } = require("mongodb");
 const Challenge = require("../models/challenge.js");
-const AppError = require("../util/AppError.js");
+const AppError = require("../utils/AppError.js");
 
 const createChallenge = async (req, res) => {
   const user = req.user;
@@ -37,8 +37,32 @@ const createChallenge = async (req, res) => {
 const getUserChallenges = async (req, res) => {
   const user = req.user;
   const queries = req.query;
+  const { page, limit, title, company, stack, sortBy } = queries;
+  const match = {};
+  const sort = {};
 
-  await req.user.populate("challenges").execPopulate();
+  if (title) match.title = title;
+  if (company) match.company = company;
+  if (stack) match.stack = stack;
+  if (sortBy) {
+    const parts = sortBy.split(":");
+    const key = parts[0];
+    const value = parts[1] === "decsc" ? -1 : 1;
+
+    sort[key] = value;
+  }
+
+  await user
+    .populate({
+      path: "challenges",
+      match,
+      options: {
+        skip: parseInt(page),
+        limit: parseInt(limit),
+        sort,
+      },
+    })
+    .execPopulate();
 
   res.json({
     success: true,
@@ -143,15 +167,23 @@ const deleteChallenge = async (req, res) => {
 };
 
 const getAllChallenges = async (req, res) => {
-  const challenges = await Challenge.find()
+  const queries = req.query;
+  const { page, limit, title, company, stack, sort } = queries;
+  const match = {};
+
+  if (title) match.title = title;
+  if (company) match.company = company;
+  if (stack) match.stack = stack;
+
+  const challenges = await Challenge.find(match)
+    .skip(parseInt(page))
+    .limit(parseInt(limit))
+    .sort({ createdAt: sort || -1 })
     .populate("completedChallenges")
     .exec();
 
-  const count = await Challenge.find().count();
-
   res.json({
     success: true,
-    count,
     data: challenges,
   });
 };

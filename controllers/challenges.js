@@ -26,7 +26,7 @@ const createChallenge = async (req, res) => {
   const challenge = await newChallenge.save();
   user.challenges.push(challengeId);
 
-  user.save();
+  await user.save();
 
   res.json({
     success: true,
@@ -103,7 +103,6 @@ const getChallenge = async (req, res) => {
 };
 
 const editChallenge = async (req, res) => {
-  const updates = {};
   const user = req.user;
   const id = req.params.id;
   const body = _.pick(req.body, [
@@ -116,32 +115,13 @@ const editChallenge = async (req, res) => {
     "company",
     "companyUrl",
   ]);
-  const {
-    title,
-    description,
-    instructions,
-    tags,
-    stack,
-    challengeRepo,
-    company,
-    companyUrl,
-  } = body;
-
-  if (title) updates.title = title;
-  if (description) updates.description = description;
-  if (instructions) updates.instructions = instructions;
-  if (tags) updates.tags = tags;
-  if (stack) updates.stack = stack;
-  if (challengeRepo) updates.challengeRepo = challengeRepo;
-  if (company) updates.company = company;
-  if (companyUrl) updates.companyUrl = companyUrl;
 
   const challenge = await Challenge.findOneAndUpdate(
     {
       _id: id,
       user: user._id,
     },
-    { $set: updates }
+    { $set: body }
   );
 
   if (!challenge) throw new AppError("Challenge does not exist", 404);
@@ -155,14 +135,13 @@ const editChallenge = async (req, res) => {
 const deleteChallenge = async (req, res) => {
   const id = req.params.id;
 
-  const challenge = await Challenge.deleteOne({ _id: id });
+  const challenge = await Challenge.findOneAndDelete({ _id: id });
 
   if (!challenge) throw new AppError("Challenge does not exist", 404);
 
   res.send({
     success: true,
     message: "Deleted successfully",
-    data: challenge,
   });
 };
 

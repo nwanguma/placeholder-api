@@ -8,11 +8,13 @@ const createdCompletedBounty = async (req, res) => {
   const bountyId = req.params.id;
   const completedBountyId = new mongodb.ObjectID();
   const body = _.pick(req.body, [
-    "comments",
-    "challengeRepo",
-    "website",
-    "githubUrl",
-    "employmentStatus",
+    "name",
+    "title",
+    "domain",
+    "subdomain",
+    "description",
+    "stepsToReproduce",
+    "impact",
   ]);
 
   if (!bountyId) throw new AppError("Missing parameters", 400);
@@ -73,6 +75,39 @@ const getUserCompletedBounties = async (req, res) => {
   });
 };
 
+const getCompletedBountiesByBounty = async (req, res) => {
+  const bountyId = req.params.id;
+  const { page, limit, sort } = req.query;
+
+  const completedBounties = await CompletedBounty.find({
+    bounty: bountyId,
+  })
+    .skip(parseInt(page))
+    .limit(parseInt(limit))
+    .sort({ createdAt: sort || -1 });
+
+  res.json({
+    success: true,
+    data: completedBounties,
+  });
+};
+
+const getCompletedBounty = async (req, res) => {
+  const completedBountyId = req.params.id;
+
+  const completedBounty = await CompletedBounty.findOne({
+    _id: completedBountyId,
+  });
+
+  if (!completedBounty)
+    throw new AppError("Completed bounty does not exist", 404);
+
+  res.json({
+    success: true,
+    data: completedBounty,
+  });
+};
+
 const getUserCompletedBounty = async (req, res) => {
   const user = req.user;
   const id = req.params.id;
@@ -91,8 +126,58 @@ const getUserCompletedBounty = async (req, res) => {
   });
 };
 
+const editCompletedBounty = async (req, res) => {
+  const user = req.user;
+  const completedBountyId = req.params.id;
+  const body = _.pick(req.body, [
+    "name",
+    "title",
+    "domain",
+    "subdomain",
+    "description",
+    "stepsToReproduce",
+    "impact",
+  ]);
+
+  const completedBounty = await CompletedBounty.findOneAndUpdate(
+    {
+      user: user._id,
+      _id: completedBountyId,
+    },
+    { $set: body }
+  );
+
+  if (!completedBounty) throw new AppError("Bounty does not exist", 404);
+
+  res.status(201).send({
+    success: true,
+    data: completedBounty,
+  });
+};
+
+const deleteCompletedBounty = async (req, res) => {
+  const user = req.user;
+  const completedBountyId = req.params.id;
+
+  const deletedcompletedBounty = await CompletedBounty.findOneAndDelete({
+    _id: completedBountyId,
+    user: user._id,
+  });
+
+  if (!deletedcompletedBounty) throw new AppError("Bounty does not exist", 404);
+
+  res.status(200).send({
+    success: true,
+    message: "Deleted successfully",
+  });
+};
+
 module.exports = {
   createdCompletedBounty,
   getUserCompletedBounties,
+  getCompletedBountiesByBounty,
+  getCompletedBounty,
   getUserCompletedBounty,
+  editCompletedBounty,
+  deleteCompletedBounty,
 };

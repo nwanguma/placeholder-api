@@ -1,9 +1,11 @@
 const _ = require("lodash");
+const { ObjectID } = require("mongodb");
 const Bounty = require("../models/bounty.js");
 const AppError = require("../utils/AppError.js");
 
 const createBounty = async (req, res) => {
   const user = req.user;
+  const bountyId = new ObjectID();
   const body = _.pick(req.body, [
     "title",
     "description",
@@ -12,8 +14,11 @@ const createBounty = async (req, res) => {
     "productUrl",
   ]);
 
-  const newBounty = new Bounty({ ...body, user: user._id });
+  const newBounty = new Bounty({ ...body, _id: bountyId, user: user._id });
   const bounty = await newBounty.save();
+  user.bounties.push(bountyId);
+
+  await user.save();
 
   res.json({
     success: true,
@@ -50,10 +55,11 @@ const getUserBounties = async (req, res) => {
     })
     .execPopulate();
 
+  console.log(user);
+
   res.json({
     success: true,
-    count,
-    data: bounties,
+    data: user.bounties,
   });
 };
 
@@ -90,45 +96,22 @@ const getBounty = async (req, res) => {
 };
 
 const editBounty = async (req, res) => {
-  const updates = {};
   const user = req.user;
   const id = req.params.id;
   const body = _.pick(req.body, [
     "title",
     "description",
     "instructions",
-    "tags",
-    "stack",
-    "challengeRepo",
-    "company",
-    "companyUrl",
+    "product",
+    "productUrl",
   ]);
-  const {
-    title,
-    description,
-    instructions,
-    tags,
-    stack,
-    challengeRepo,
-    company,
-    companyUrl,
-  } = body;
-
-  if (title) updates.title = title;
-  if (description) updates.description = description;
-  if (instructions) updates.instructions = instructions;
-  if (tags) updates.tags = tags;
-  if (stack) updates.stack = stack;
-  if (challengeRepo) updates.challengeRepo = challengeRepo;
-  if (company) updates.company = company;
-  if (companyUrl) updates.companyUrl = companyUrl;
 
   const bounty = await Bounty.findOneAndUpdate(
     {
       _id: id,
       user: user._id,
     },
-    { $set: updates }
+    { $set: body }
   );
 
   if (!bounty) throw new AppError("Bounty does not exist", 404);
@@ -171,7 +154,6 @@ const getAllBounties = async (req, res) => {
 
   res.json({
     success: true,
-    count,
     data: bounties,
   });
 };

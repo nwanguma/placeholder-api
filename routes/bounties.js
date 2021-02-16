@@ -12,9 +12,14 @@ const {
   getUserCompletedBounties,
   getUserCompletedBounty,
   createdCompletedBounty,
+  editCompletedBounty,
+  deleteCompletedBounty,
+  getCompletedBountiesByBounty,
+  getCompletedBounty,
 } = require("../controllers/completedBounties.js");
 const authenticate = require("../middlewares/auth.js");
 const bountyValidation = require("../middlewares/bountyValidation.js");
+const completedBountyValidation = require("../middlewares/completedBountyValidation.js");
 const catchAsync = require("../utils/catchAsync.js");
 
 const router = express.Router();
@@ -25,7 +30,7 @@ router
   .post(authenticate, bountyValidation, catchAsync(createBounty))
   .get(authenticate, catchAsync(getUserBounties));
 
-//Get a user's completed challenges
+//Get a user's completed bounties
 router
   .route("/complete")
   .get(authenticate, catchAsync(getUserCompletedBounties));
@@ -33,17 +38,29 @@ router
 router.route("/all").get(authenticate, catchAsync(getAllBounties));
 router.route("/all/:id").get(authenticate, catchAsync(getBounty));
 
-//edit specific challenge, delete specific challenge, list specific challenge
+//edit specific bounty, delete specific bounty, list specific bounty
 router
   .route("/:id")
   .patch(authenticate, catchAsync(editBounty))
   .delete(authenticate, catchAsync(deleteBounty))
   .get(authenticate, catchAsync(getUserBounty));
 
-//get single completed challenge
+//get completed bounties by bounty id
+router
+  .route("/complete/all/:id")
+  .get(authenticate, catchAsync(getCompletedBountiesByBounty));
+
+//get single completed bounty by it's id for all authorized users
+router
+  .route("/complete/bounty/:id")
+  .get(authenticate, catchAsync(getCompletedBounty));
+
+//get single completed bounty
 router
   .route("/complete/:id")
   .get(authenticate, catchAsync(getUserCompletedBounty))
-  .post(authenticate, catchAsync(createdCompletedBounty));
+  .post(authenticate, catchAsync(createdCompletedBounty))
+  .put(authenticate, completedBountyValidation, catchAsync(editCompletedBounty))
+  .delete(authenticate, catchAsync(deleteCompletedBounty));
 
 module.exports = router;

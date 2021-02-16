@@ -1,15 +1,18 @@
 const mongoose = require("mongoose");
 const _ = require("lodash");
+const Bounty = require("./bounty.js");
 
 const CompletedBountySchema = new mongoose.Schema(
   {
-    comments: String,
-    challengeRepo: String,
-    website: String,
-    githubUrl: String,
-    // employmentStatus: Boolean,
+    name: String,
+    title: String,
+    domain: String,
+    subdomain: String,
+    description: String,
+    stepsToReproduce: [String],
+    impact: String,
     user: { ref: "user", type: mongoose.Schema.Types.ObjectId },
-    challenge: {
+    bounty: {
       ref: "Bounty",
       type: mongoose.Schema.Types.ObjectId,
     },
@@ -20,14 +23,14 @@ const CompletedBountySchema = new mongoose.Schema(
 CompletedBountySchema.pre("save", async function (next) {
   const completedBounty = this;
 
-  const challenge = await Challenge.findOne({
+  const bounty = await Bounty.findOne({
     _id: completedBounty.bounty,
   });
 
-  if (challenge) {
-    challenge.completedBountys.push(completedBounty._id);
+  if (bounty) {
+    bounty.completedBounties.push(completedBounty._id);
 
-    await challenge.save();
+    await bounty.save();
 
     next();
   } else {
@@ -40,11 +43,13 @@ CompletedBountySchema.methods.toJSON = function () {
   const completedBountyObject = completedBounty.toObject();
 
   const body = _.pick(completedBountyObject, [
-    "comments",
-    "challengeRepo",
-    "website",
-    "githubUrl",
-    "employmentStatus",
+    "name",
+    "title",
+    "domain",
+    "subdomain",
+    "description",
+    "stepsToReproduce",
+    "impact",
     "_id",
   ]);
 

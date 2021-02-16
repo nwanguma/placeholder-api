@@ -5,6 +5,9 @@
   "repository": "https://github.com/nwanguma/defi-api",
   "author": "Tochukwu Nwanguma <tochukwu@cico.ng>",
   "license": "MIT",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "@sendgrid/mail": "^7.4.2",
     "bcryptjs": "^2.4.3",

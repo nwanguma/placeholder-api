@@ -56,8 +56,6 @@ const getUserCompletedChallenges = async (req, res) => {
     sort[key] = value;
   }
 
-  console.log("donny van der bench");
-
   await user
     .populate({
       path: "completedChallenges",
@@ -70,11 +68,42 @@ const getUserCompletedChallenges = async (req, res) => {
     })
     .execPopulate();
 
-  console.log(req.user);
-
   res.json({
     success: true,
     data: req.user.completedChallenges,
+  });
+};
+
+const getCompletedChallengesByChallenge = async (req, res) => {
+  const challengeId = req.params.id;
+  const { page, limit, sort } = req.query;
+
+  const completedChallenges = await CompletedChallenge.find({
+    challenge: challengeId,
+  })
+    .skip(parseInt(page))
+    .limit(parseInt(limit))
+    .sort({ createdAt: sort || -1 });
+
+  res.json({
+    success: true,
+    data: completedChallenges,
+  });
+};
+
+const getCompletedChallenge = async (req, res) => {
+  const completedChallengeId = req.params.id;
+
+  const completedChallenge = await CompletedChallenge.findOne({
+    _id: completedChallengeId,
+  });
+
+  if (!completedChallenge)
+    throw new AppError("Completed challenge does not exist", 404);
+
+  res.json({
+    success: true,
+    data: completedChallenge,
   });
 };
 
@@ -96,8 +125,57 @@ const getUserCompletedChallenge = async (req, res) => {
   });
 };
 
+const editCompletedChallenge = async (req, res) => {
+  const user = req.user;
+  const completedChallengeId = req.params.id;
+  const body = _.pick(req.body, [
+    "comments",
+    "challengeRepo",
+    "website",
+    "githubUrl",
+    "employmentStatus",
+  ]);
+
+  const completedChallenge = await CompletedChallenge.findOneAndUpdate(
+    {
+      user: user._id,
+      _id: completedChallengeId,
+    },
+    { $set: body }
+  );
+
+  if (!completedChallenge) throw new AppError("Challenge does not exist", 404);
+
+  res.status(201).send({
+    success: true,
+    data: completedChallenge,
+  });
+};
+
+const deleteCompletedChallenge = async (req, res) => {
+  const user = req.user;
+  const completedChallengeId = req.params.id;
+
+  const deletedCompletedChallenge = await CompletedChallenge.findOneAndDelete({
+    _id: completedChallengeId,
+    user: user._id,
+  });
+
+  if (!deletedCompletedChallenge)
+    throw new AppError("Challenge does not exist", 404);
+
+  res.status(201).send({
+    success: true,
+    message: "Deleted successfully",
+  });
+};
+
 module.exports = {
   createCompletedChallenge,
   getUserCompletedChallenges,
+  getCompletedChallengesByChallenge,
+  getCompletedChallenge,
   getUserCompletedChallenge,
+  editCompletedChallenge,
+  deleteCompletedChallenge,
 };

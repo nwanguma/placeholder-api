@@ -12,6 +12,8 @@ const error = require("./middlewares/error.js");
 const app = express();
 const port = process.env.PORT || 3000;
 
+console.log(port);
+
 app.use(cors());
 app.use(bodyParser.json());
 

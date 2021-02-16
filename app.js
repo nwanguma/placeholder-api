@@ -36,6 +36,11 @@ app.use((err, req, res, next) => {
       message: "Id parameter is invalid",
     });
 
+  if (err.name === "MongoError")
+    res.status(400).send({
+      success: false,
+    });
+
   next(err);
 });
 

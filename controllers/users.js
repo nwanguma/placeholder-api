@@ -8,6 +8,12 @@ const sendWelcomeEmail = require("../emails/account.js");
 const createUser = async (req, res) => {
   const body = _.pick(req.body, ["username", "email", "password"]);
 
+  const userWithEmail = await User.findOne({ email: body.email });
+  const userWithUsername = await User.findOne({ username: body.username });
+
+  if (userWithEmail) throw new AppError("Email is taken", 400);
+  if (userWithUsername) throw new AppError("Username is taken", 400);
+
   const newUser = new User(body);
 
   const user = await newUser.save();

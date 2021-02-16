@@ -9,9 +9,14 @@ const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
+      required: [true, "Username is required"],
+      unique: [true, "Username is taken"],
     },
-    email: { type: String, required: true },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: [true, "Email is required"],
+    },
     password: { type: String, required: true },
     profile: { type: mongoose.Schema.Types.ObjectId, ref: "Profile" },
     completedChallenges: [

@@ -7,7 +7,7 @@ const {
 } = require("../controllers/users.js");
 const authenticate = require("../middlewares/auth");
 const catchAsync = require("../utils/catchAsync.js");
-const userValidation = require("../middlewares/userInputValidation.js");
+const { userValidation } = require("../middlewares/validation.js");
 
 const router = express.Router();
 

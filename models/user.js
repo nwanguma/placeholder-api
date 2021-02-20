@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const { ObjectID } = require("mongodb");
 const Profile = require("./profile");
 const jwt = require("jsonwebtoken");
+const { findOne } = require("./profile");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -25,6 +26,16 @@ const UserSchema = new mongoose.Schema(
     completedBounties: [
       { type: mongoose.Schema.Types.ObjectId, ref: "CompletedBounty" },
     ],
+    jobposts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
+    likedJobposts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
+    jobpostComments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    likedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    productComments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    blogposts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }],
+    blogComments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }],
+    likedBlogposts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }],
+    jobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
     challenges: [{ type: mongoose.Schema.Types.ObjectId, ref: "Challenge" }],
     bounties: [{ type: mongoose.Schema.Types.ObjectId, ref: "Bounty" }],
     tokens: [
@@ -37,7 +48,7 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-UserSchema.statics.findByToken = function (token) {
+UserSchema.statics.findByToken = async function (token) {
   let decoded;
   const User = this;
 
@@ -54,15 +65,11 @@ UserSchema.statics.findByToken = function (token) {
   });
 };
 
-UserSchema.statics.findByCredentials = async function (
-  username,
-  email,
-  password
-) {
+UserSchema.statics.findByCredentials = async function (id, password) {
   const User = this;
 
   const user = await User.findOne({
-    $or: [{ username }, { email }],
+    $or: [{ username: id }, { email: id }],
   });
 
   if (!user) return Promise.reject({ status: 404, message: "User not found" });
@@ -114,6 +121,8 @@ UserSchema.methods.toJSON = function () {
   const profileBody = _.pick(profileObject, [
     "firstname",
     "lastname",
+    "username",
+    "email",
     "bio",
     "company",
     "githubUrl",
@@ -125,8 +134,14 @@ UserSchema.methods.toJSON = function () {
 
 UserSchema.methods.generateProfile = async function () {
   const user = this;
+
   const profileId = new ObjectID();
-  const newProfile = new Profile({ _id: profileId, user: user._id });
+  const newProfile = new Profile({
+    _id: profileId,
+    user: user._id,
+    email: user.email,
+    username: user.username,
+  });
 
   await newProfile.save();
 

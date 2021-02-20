@@ -18,8 +18,10 @@ const {
   getCompletedBounty,
 } = require("../controllers/completedBounties.js");
 const authenticate = require("../middlewares/auth.js");
-const bountyValidation = require("../middlewares/bountyValidation.js");
-const completedBountyValidation = require("../middlewares/completedBountyValidation.js");
+const {
+  bountyValidation,
+  completedBountyValidation,
+} = require("../middlewares/validation.js");
 const catchAsync = require("../utils/catchAsync.js");
 
 const router = express.Router();

@@ -16,8 +16,20 @@ const getProfile = async (req, res) => {
 };
 
 const createProfile = async (req, res) => {
-  const body = _.pick(req.body, ["firstname", "lastname"]);
-  const newProfile = new Profile(body);
+  const user = req.user;
+  const body = _.pick(req.body, [
+    "firstname",
+    "lastname",
+    "bio",
+    "company",
+    "githubUrl",
+    "website",
+  ]);
+  const newProfile = new Profile({
+    body,
+    username: user.username,
+    email: user.email,
+  });
 
   const profile = await newProfile.save();
 
@@ -34,23 +46,23 @@ const editProfile = async (req, res) => {
     "firstname",
     "lastname",
     "bio",
+    "email",
+    "username",
     "company",
     "website",
     "githubUrl",
   ]);
-  const { firstname, lastname, bio, company, website, githubUrl } = body;
+  const { email, username } = body;
 
-  if (firstname) updates.firstname = firstname;
-  if (lastname) updates.lastname = lastname;
-  if (bio) updates.bio = bio;
-  if (company) updates.company = company;
-  if (website) updates.website = website;
-  if (githubUrl) updates.githubUrl = githubUrl;
+  if (email !== user.email)
+    throw new AppError("Email update is not allowed", 403);
+  if (username !== user.username)
+    throw new AppError("Username update is not allowed ", 403);
 
   const profile = await Profile.findOneAndUpdate(
     { user: user._id },
     {
-      $set: updates,
+      $set: body,
     },
     { returnOriginal: false }
   );

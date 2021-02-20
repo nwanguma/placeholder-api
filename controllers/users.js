@@ -31,10 +31,10 @@ const createUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const body = _.pick(req.body, ["username", "email", "password"]);
-  const { username, email, password } = body;
+  const body = _.pick(req.body, ["id", "password"]);
+  const { id, password } = body;
 
-  const user = await User.findByCredentials(username, email, password);
+  const user = await User.findByCredentials(id, password);
   const token = await user.generateAuthToken();
   const userWithValues = await user
     .populate("challenges")

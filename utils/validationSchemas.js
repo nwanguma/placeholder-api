@@ -1,30 +1,29 @@
-const Joi = require("joi");
 const joi = require("joi");
 
 const userValidationSchema = joi.object({
-  username: Joi.string().min(3).required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().required(),
+  username: joi.string().min(3).required(),
+  email: joi.string().email().required(),
+  password: joi.string().required(),
 });
 
 const challengeValidationSchema = joi.object({
-  title: Joi.string().min(3).required(),
-  description: Joi.string().min(20).required(),
-  instructions: Joi.string().min(20).required(),
-  tags: Joi.array(),
-  stack: Joi.string().required(),
-  challengeRepo: Joi.string().uri().optional(),
-  company: Joi.string(),
-  companyUrl: Joi.string(),
+  title: joi.string().min(3).required(),
+  description: joi.string().min(20).required(),
+  instructions: joi.string().min(20).required(),
+  tags: joi.array(),
+  stack: joi.string().required(),
+  challengeRepo: joi.string().uri().optional(),
+  company: joi.string(),
+  companyUrl: joi.string(),
 });
 
 const bountyValidationSchema = joi.object({
-  title: Joi.string().min(3).required(),
-  description: Joi.string().min(20).required(),
-  instructions: Joi.string().min(20).required(),
-  product: Joi.string().required(),
-  productUrl: Joi.string().uri().required(),
-  expiry: Joi.string(),
+  title: joi.string().min(3).required(),
+  description: joi.string().min(20).required(),
+  instructions: joi.string().min(20).required(),
+  product: joi.string().required(),
+  productUrl: joi.string().uri().required(),
+  expiry: joi.string(),
 });
 
 const completedChallengeValidationSchema = joi.object({
@@ -45,10 +44,65 @@ const completedBountyValidationSchema = joi.object({
   impact: joi.string().uri().required(),
 });
 
+const profileValidationSchema = joi.object({
+  firstname: joi.string().min(3).required(),
+  lastname: joi.string().min(3).required(),
+  bio: joi.string().min(3).required(),
+  company: joi.string().min(3).required(),
+  githubUrl: joi.string().uri().min(3).required(),
+  website: joi.string().uri().min(3).required(),
+});
+
+const productValidationSchema = joi.object({
+  title: joi.string().required(),
+  description: joi.string().min(3).required(),
+  poster: joi.object({
+    firstname: joi.string().min(3).optional(),
+    lastname: joi.string().min(3).optional(),
+    email: joi.string().email().min(3).optional(),
+    twitterUrl: joi.string().uri().min(3).optional(),
+    linkedinUrl: joi.string().uri().min(3).optional(),
+  }),
+  makers: joi
+    .array()
+    .items(
+      joi.object({
+        firstname: joi.string().min(3).optional(),
+        lastname: joi.string().min(3).optional(),
+        email: joi.string().email().min(3).optional(),
+        twitterUrl: joi.string().uri().min(3).optional(),
+        linkedinUrl: joi.string().uri().min(3).optional(),
+      })
+    )
+    .required(),
+});
+
+const jobValidationSchema = joi.object({
+  title: joi.string().min(3).required(),
+  description: joi.string().min(3).required(),
+  responsibilities: joi.array().items(joi.string()).required(),
+  tags: joi.array().items(joi.string()).optional(),
+  stack: joi.string().min(3).required(),
+  qualifications: joi.string().min(3).required(),
+  benefits: joi.string().min(3).required(),
+  company: joi.string().min(3).required(),
+  companyUrl: joi.string().uri().min(3).required(),
+  applicationUrl: joi.string().uri().min(3).required(),
+});
+
+const blogValidationSchema = joi.object({
+  title: joi.string().min(3).required(),
+  body: joi.string().min(3).required(),
+});
+
 module.exports = {
   userValidationSchema,
   challengeValidationSchema,
   bountyValidationSchema,
   completedChallengeValidationSchema,
   completedBountyValidationSchema,
+  profileValidationSchema,
+  productValidationSchema,
+  jobValidationSchema,
+  blogValidationSchema,
 };

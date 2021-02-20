@@ -18,8 +18,10 @@ const {
   getCompletedChallengesByChallenge,
 } = require("../controllers/completedChallenges.js");
 const authenticate = require("../middlewares/auth.js");
-const challengeValidation = require("../middlewares/challengeValidation.js");
-const completedChallengeValidation = require("../middlewares/completedChallengeValidation.js");
+const {
+  challengeValidation,
+  completedChallengeValidation,
+} = require("../middlewares/validation.js");
 const catchAsync = require("../utils/catchAsync.js");
 
 const router = express.Router();

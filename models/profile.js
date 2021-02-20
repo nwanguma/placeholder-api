@@ -11,6 +11,12 @@ const ProfileSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    email: {
+      type: String,
+    },
+    username: {
+      type: String,
+    },
     bio: {
       type: String,
       default: "",
@@ -42,6 +48,8 @@ ProfileSchema.methods.toJSON = function () {
   const body = _.pick(profileObject, [
     "firstname",
     "lastname",
+    "username",
+    "email",
     "bio",
     "company",
     "githubUrl",

@@ -5,6 +5,7 @@ const {
   editProfile,
 } = require("../controllers/profile.js");
 const authenticate = require("../middlewares/auth.js");
+const { profileValidation } = require("../middlewares/validation.js");
 const catchAsync = require("../utils/catchAsync.js");
 
 const router = express.Router();
@@ -12,7 +13,7 @@ const router = express.Router();
 router
   .route("/")
   .get(authenticate, catchAsync(getProfile))
-  .post(authenticate, catchAsync(createProfile))
-  .patch(authenticate, catchAsync(editProfile));
+  .post(authenticate, profileValidation, catchAsync(createProfile))
+  .put(authenticate, profileValidation, catchAsync(editProfile));
 
 module.exports = router;

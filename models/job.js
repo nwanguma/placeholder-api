@@ -10,21 +10,18 @@ const jobSchema = new Schema({
   },
   description: {
     type: String,
-    required: [true, "Description is required"],
   },
   responsibilities: {
     type: [String],
-    required: [true, "Responsibilities is required"],
   },
   tags: [String],
+  location: String,
   stack: String,
   qualifications: {
     type: String,
-    required: [true, "Qualifications is required"],
   },
   benefits: {
     type: String,
-    required: [true, "Benefits is required"],
   },
   company: {
     type: String,
@@ -38,6 +35,7 @@ const jobSchema = new Schema({
     type: String,
     required: true,
   },
+
   likes: [
     {
       author: String,
@@ -81,6 +79,8 @@ jobSchema.methods.toJSON = function () {
     "comments",
     "_id",
     "createdAt",
+    "applicationUrl",
+    "location",
   ]);
 
   return body;

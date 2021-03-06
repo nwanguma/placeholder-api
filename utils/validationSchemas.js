@@ -79,15 +79,16 @@ const productValidationSchema = joi.object({
 
 const jobValidationSchema = joi.object({
   title: joi.string().min(3).required(),
-  description: joi.string().min(3).required(),
-  responsibilities: joi.array().items(joi.string()).required(),
+  description: joi.string().min(3).optional(),
+  responsibilities: joi.array().items(joi.string()).optional(),
   tags: joi.array().items(joi.string()).optional(),
-  stack: joi.string().min(3).required(),
-  qualifications: joi.string().min(3).required(),
-  benefits: joi.string().min(3).required(),
-  company: joi.string().min(3).required(),
-  companyUrl: joi.string().uri().min(3).required(),
-  applicationUrl: joi.string().uri().min(3).required(),
+  stack: joi.string().min(3).optional(),
+  qualifications: joi.string().min(3).optional(),
+  benefits: joi.string().min(3).optional(),
+  company: joi.string().min(3).optional(),
+  companyUrl: joi.string().uri().min(3).optional(),
+  applicationUrl: joi.string().uri().min(3).optional(),
+  location: joi.string().optional(),
 });
 
 const blogValidationSchema = joi.object({
